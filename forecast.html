@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>宏观经济预测与分析平台</title>
+    <meta name='description' content='MMB forecasting application'>
+    <link rel='stylesheet' href='./css/bootstrap.min.css'>
+    <link rel='stylesheet' href='./css/stylesheet.css'>
+  </head>
+
+  <body data-spy='scroll' data-target='#navbar-example'>
+
+    <div id='navbar_placeholder'></div>
+
+    <div class='container'>
+      <h1 class='page-header'>创建预测图</h1>
+      <p class='lead'>要创建预测图表，请指定预测起始日期、选择预测模型、确认数据使用场景</p>
+
+      <form id='selectForm'>
+
+        <fieldset class='form-group big-group'>
+          <div class='row'>
+            <div class='col'>
+              <legend class='col-form-label pt-0'>预测起始日期</legend>
+            </div>
+            <div class='w-100'></div>
+            <div class='col' id='selectvintage'></div>
+          </div>
+        </fieldset>
+
+        <fieldset class='form-group big-group'>
+          <div class='row'>
+            <div class='col'>
+              <legend class='col-form-label pt-0'>预测模型</legend>
+            </div>
+          </div>
+
+          <fieldset class='form-group small-group'>
+            <div class='row'>
+              <div class='col'>
+                <legend class='col-form-label pt-0'>宏观经济模型<a href='' id='dsgeAll'>全选</a><a href='' id='dsgeClear'>取消选择</a></legend>
+              </div>
+              <div class='w-100'></div>
+  
+              <!-- <div class='col row'>
+                <div class='col-2 pt-0'>Filters</div>
+                <div class='col-10'>
+                  <div class='btn-group btn-group-sm' role='group' id='filterModel'>
+                    <button type='button' class='btn btn-outline-primary' style='font-size: 0.8em;'>Pre-crisis</button>
+                    <button type='button' class='btn btn-primary' style='font-size: 0.8em;'>All</button>
+                    <button type='button' class='btn btn-outline-primary' style='font-size: 0.8em;'>Post-crisis</button>
+                  </div>
+                </div>
+              </div>
+              <div class='w-100'></div> -->
+  
+              <div class='col' id='selectdsge'></div>
+            </div>
+          </fieldset>
+  
+          <fieldset class='form-group small-group'>
+            <div class='row'>
+              <div class='col'>
+                <legend class='col-form-label pt-0'>时间序列模型<a href='' id='tsAll'>全选</a><a href='' id='tsClear'>取消选择</a></legend>
+              </div>
+              <div class='w-100'></div>
+              <div class='col' id='selectts'></div>
+            </div>
+          </fieldset>
+
+          <fieldset class='form-group small-group'>
+            <div class='row'>
+              <div class='col'>
+                <legend class='col-form-label pt-0'>其他预测来源<a href='' id='externalAll'>全选</a><a href='' id='externalClear'>取消选择</a></legend>
+              </div>
+              <div class='w-100'></div>
+              <div class='col' id='selectexternal'></div>
+            </div>
+          </fieldset>
+  
+          <!-- <fieldset class='form-group small-group'>
+            <div class='row'>
+              <div class='col'>
+                <legend class='col-form-label pt-0'>External projections <a href='' id='externalAll'>All</a><a href='' id='externalClear'>Clear</a></legend>
+              </div>
+              <div class='w-100'></div>
+              <div class='col' id='selectExternal'>
+                <div class='form-check form-check-inline'>
+                  <input class='form-check-input' type='checkbox' id='select专业分析师预测(均值)' name='external' value='专业分析师预测(均值)' disabled>
+                  <label class='form-check-label' for='select专业分析师预测(均值)' id='select专业分析师预测(均值)label'>Survey of Professional Forecasters - Mean level</label>
+                </div>
+                <div class='form-check form-check-inline'>
+                  <input class='form-check-input' type='checkbox' id='selectSPFAll' name='external' value='SPFAll' disabled>
+                  <label class='form-check-label' for='selectSPFAll' id='selectSPFAlllabel' >Survey of Professional Forecasters - Individual</label>
+                </div>
+                <div class='form-check form-check-inline'>
+                  <input class='form-check-input' type='checkbox' id='selectFRB' name='external' value='FRB' disabled>
+                  <label class='form-check-label' for='selectFRB' id='selectFRB'>Greenbook from the Federal Reserve Board of Governors</label>
+                </div>
+              </div>
+            </div>
+          </fieldset> -->
+        </fieldset>
+
+        <fieldset class='form-group big-group'>
+          <div class='row'>
+            <div class='col'>
+              <legend class='col-form-label pt-0'>数据使用场景<a href='' id='scenarioAll'>全选</a> <a href='' id='scenarioClear'>取消选择</a></legend>
+            </div>
+            <div class='w-100'></div>
+            <div class='col' id='selectscenario'></div>
+          </div>
+        </fieldset>
+
+        <div class='row justify-content-center'>
+          <button type='submit' class='btn btn-primary'>绘制预测图</button>
+        </div>
+
+      </form>
+
+      <div id='warning' style='color:red'></div>
+      
+    </div>
+
+    <hr>
+    <div class='container-fluid' style='padding: 0pt; margin: 0pt;' id='bigChart'></div>
+    <hr>
+
+    <script src='./js/jquery.js'></script>
+    <script src='./js/popper.min.js'></script>
+    <script src='./js/bootstrap.min.js'></script>
+    <script src="./js/Chart.bundle.js"></script>
+    <script src="./js/chartjs-plugin-annotation.js"></script>
+
+    <script src="./js/constants.js"></script>
+    <script>
+      'use strict';
+
+      $('#navbar_placeholder').load('./common/navbar.html');
+
+      fetch('./src/results.json').then(response => response.json()).then(data => {
+
+        function addItems(selectType, buttonType) {
+
+          let typeSet = new Set();
+
+          if (['dsge', 'ts', 'external'].includes(selectType)) {
+            data[selectType].forEach(item => typeSet.add(item['model']));
+          } else {
+            data['ts'].forEach(item => typeSet.add(item[selectType]));
+            data['dsge'].forEach(item => typeSet.add(item[selectType]));
+            data['external'].forEach(item => typeSet.add(item[selectType]));
+          }
+          typeSet.delete(undefined);
+
+          let typeArray = Array.from(typeSet);
+          typeArray.sort();
+
+          let addString = '';
+
+          for (let item of typeArray) {
+             let newString = `
+             <div class='form-check form-check-inline'>\n<input class='form-check-input' type='${buttonType}' id='select${item}' name='${selectType}' value='${item}'>\n<label class='form-check-label' for='select${item}' id='select${item}label'>${item}</label>\n</div>\n
+             `;
+
+            if (selectType == 'scenario') {
+              newString = newString.replace(`id='select${item}label'>${item}`, `id='select${item}label'>${scenarioStrings[item]}`)
+            }
+
+            addString += newString;
+          }
+
+          return addString;
+        }
+
+        for (let selectType of ['dsge', 'ts', 'external', 'vintage', 'scenario']) {
+          document.getElementById('select' + selectType).innerHTML = addItems(selectType, 'checkbox');
+        }
+
+        document.getElementById('select专业分析师预测(均值)').checked = true;
+        document.getElementById('select专业分析师预测(单独值)').checked = true;
+
+      });
+
+      // switch selection
+      // $('#filterModel button').click(function() {
+      //   $(this).removeClass('btn-outline-primary').addClass('btn-primary').siblings().removeClass('btn-primary').addClass('btn-outline-primary');
+      // });
+
+      
+
+      for (let part of ['dsge', 'ts', 'external', 'scenario']) {
+        for (let status of ['All', 'Clear']) {
+          let checkedStatus = (status == 'All') ? true : false;
+          document.getElementById(`${part}${status}`).addEventListener('click', function (event) {
+            event.preventDefault();
+            document.querySelectorAll(`input[name=${part}]`).forEach(function (item) {
+              if (!(item.disabled)) {
+                item.checked = checkedStatus;
+              }
+            });
+          });
+        }
+      }
+
+      // get selection
+      document.getElementById('selectForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const selection = $(this).serializeArray();
+        // $(this)[0].reset();
+        document.getElementById('select专业分析师预测(均值)').checked = true;
+        document.getElementById('select专业分析师预测(单独值)').checked = true;
+
+        var selected = {
+          'vintage': [],
+          'dsge': [],
+          'ts': [],
+          'scenario': [],
+          'external': [],
+          'vintageQuarter': [],
+        }
+        for (let item of selection) {
+          selected[item.name].push(item.value);
+        }
+
+        var bigChart = document.getElementById('bigChart');
+        while (bigChart.firstChild) {
+            bigChart.removeChild(bigChart.firstChild);
+          }
+        bigChart.innerHTML = `<p class="legend" style='text-align: center;'></p>`;
+
+        for (let ivintage = 0; ivintage < selected['vintage'].length; ivintage++) {
+
+          // console.log(ivintage);
+          // let warningShowDescription = document.createElement('p');
+          // warningShowDescription.innerHTML = `Forecasts from ${selected['dsge']} on ${selected['vintage']} in scenario ${selected['scenario']} will be shown.`;
+          // document.getElementById('warning').appendChild(warningShowDescription);
+
+          let yearStart = parseInt(selected['vintage'][ivintage].substring(0, 4));
+          let quarterStart = Math.floor((parseInt(selected['vintage'][ivintage].substring(5,7)) - 1) / 3) + 1;
+          let vintageQuarter = yearStart + 'Q' + quarterStart;
+          // selected['vintageQuarter'].push(vintageQuarter);
+
+          if (quarterStart == 1) {
+            quarterStart = 4;
+            yearStart -= 1;
+          } else {
+            quarterStart -= 1;
+          }
+          let xlabels = new Array(40);
+          let quarter = quarterStart, year = yearStart;
+          for (let i = 0; i < xlabels.length; i++) {
+            xlabels[i] = year.toString().substring(2) + 'Q' + quarter;
+            if (quarter == 4) {
+              quarter = 1;
+              year += 1;
+            } else {
+              quarter += 1;
+            }
+          }
+
+
+          fetch('./src/results.json').then(response => response.json()).then(data => {
+
+            let supTitle = document.createElement('h5');
+            supTitle.setAttribute('style', 'margin: 0%; padding: 0; text-align:center; font-weight: bold; font-size: 16pt;');
+            supTitle.innerText = `Forecast start ${vintageQuarter}`;
+            bigChart.appendChild(supTitle);
+
+            let charts = document.createElement('div');
+            charts.classList.add('row');
+            charts.id = `charts${ivintage}`;
+            bigChart.appendChild(charts);
+
+            // let charts = document.getElementById('charts');
+            // while (charts.firstChild) {
+            //   charts.removeChild(charts.firstChild);
+            // }
+
+            // let supTitle = document.createElement('div');
+            // supTitle.classList.add('col');
+            // supTitle.innerHTML = `<h5 style='text-align: center;'>Forecast start ${vintageQuarter}</h5>`;
+            // let breakTitle = document.createElement('div');
+            // breakTitle.classList.add('w-100');
+            // breakTitle.classList.add('h-25');
+            // charts.appendChild(supTitle);
+            // charts.appendChild(breakTitle);
+
+            // get actual GDP series
+            let actualSeries = [];
+            for (let i = 0; i < data['actual'].length; i++) {
+              if (data['actual'][i].vintageQuarter == vintageQuarter) {
+                actualSeries = data['actual'][i].actual.gdp;
+                break;
+              }
+            }
+
+            let loopedOnce = false;
+            let chartNumber = 0;
+            for (let scenario of selected['scenario']) {
+
+              let divCol = document.createElement('div');
+              divCol.classList.add(`col-sm-${12/selected['scenario'].length}`);
+              divCol.classList.add(`col-xs-${12/selected['scenario'].length}`);
+              let canvas = document.createElement('canvas');
+              divCol.appendChild(canvas);
+              charts.appendChild(divCol);
+
+              let ctx = canvas.getContext('2d');
+
+              let datasets = [];
+              let gdpDataThreshold = 100;
+              var gdpLastQuarter = 0;
+              for (let type of ['dsge', 'ts', 'external']) {
+                for (let model of selected[type]) {
+                  var gdpData = [];
+                  var alreadyHaveThisLabel = [];
+                  for (let i = 0; i < data[type].length; i++) {
+                    if (data[type][i].model == model) {
+                      gdpData = data[type][i].forecast.gdp;
+                      // for (let i = 0; i < gdpData.length; i++) {
+                      //   if (Math.abs(gdpData[i]) > gdpDataThreshold) {
+                      //     console.log(gdpData[i]);
+                      //     gdpData = gdpData.slice(0, i+1);
+                      //     break;
+                      //   }
+                      // }
+                      if ((data[type][i].vintageQuarter == vintageQuarter) && (data[type][i].scenario == undefined) && (data[type][i].model == '专业分析师预测(均值)')) {
+                        datasets.push({
+                          fill: false,
+                          label: data[type][i].model,
+                          data: gdpData,
+                          backgroundColor: 'DarkGreen',
+                          borderColor: 'DarkGreen',
+                          borderWidth: 4,
+                        });
+                      } else if ((data[type][i].vintage == selected['vintage'][ivintage]) && (data[type][i].scenario == scenario)) {
+                        gdpLastQuarter = gdpData[0];
+                        datasets.push({
+                          fill: false,
+                          label: model,
+                          data: gdpData,
+                          backgroundColor: modelColor[model],
+                          borderColor: modelColor[model],
+                          borderDash: modelDash[model],
+                          pointRadius: 2.5,
+                        });
+                        break;
+                      } else if ((data[type][i].vintageQuarter == vintageQuarter) && (data[type][i].scenario == undefined)) {
+                        gdpLastQuarter = gdpData[0];
+                        if (alreadyHaveThisLabel.includes(model)) {
+                          datasets.push({
+                            fill: false,
+                            label: 'Individual SPF',
+                            data: gdpData,
+                            backgroundColor: modelColor[model],
+                            borderColor: modelColor[model],
+                            borderDash: modelDash[model],
+                            pointRadius: 0,
+                            pointHitRadius: 0,
+                            borderWidth: 2,
+                          });
+                        } else {
+                          datasets.push({
+                            fill: false,
+                            label: model,
+                            data: gdpData,
+                            backgroundColor: modelColor[model],
+                            borderColor: modelColor[model],
+                            borderDash: modelDash[model],
+                            pointRadius: 0,
+                          });
+                          alreadyHaveThisLabel.push(model);
+                        }
+                        
+                      }
+                    
+                    }
+                  }
+
+
+                } 
+              }
+
+              if (loopedOnce == false) {
+                loopedOnce = true;
+                actualSeries.unshift(gdpLastQuarter);
+              }
+
+              datasets.push({
+                fill: false,
+                label: 'Actual',
+                data: actualSeries,
+                backgroundColor: 'Black',
+                borderColor: 'Black',
+                borderWidth: 4,
+              });
+
+              let recessionPeriods = [];
+              for (let quarter of nberRecessionQuarter) {
+                let quarterNext = '';
+                if (parseInt(quarter[5]) == 4) {
+                  quarterNext = (parseInt(quarter.substring(0, 4)) + 1) + 'Q1';
+                } else {
+                  quarterNext = quarter.substring(0, 5) + (parseInt(quarter[5]) + 1);
+                }
+                recessionPeriods.push({
+                  type: 'box',
+                  drawTime: 'beforeDatasetsDraw',
+                  xScaleID: 'x-axis-0',
+                  xMin: quarter.substring(2),
+                  xMax: quarterNext.substring(2),
+                  borderColor: 'rgba(220, 220, 220, 0.5)',
+                  backgroundColor: 'rgba(220, 220, 220, 0.5)',
+                })
+              }
+
+              
+
+              Chart.defaults.global.defaultFontFamily = 'Arial';
+              Chart.defaults.global.defaultFontColor = 'Black';
+              Chart.defaults.global.defaultFontSize = 16;
+              Chart.defaults.global.elements.point.radius = 1;
+              Chart.defaults.global.elements.line.tension = 0;
+              let minY = 1000, maxY = -1000;
+              for (let datum of datasets) {
+                minY = Math.min(minY, Math.round(Math.min(...datum['data'].slice(0, 6))-1));
+                maxY = Math.max(maxY, Math.round(Math.max(...datum['data'].slice(0, 6))+1));
+              }
+              let chart = new Chart(ctx, {
+                  type: 'line',
+                  
+                  data: {
+                      labels: xlabels.slice(0, 6),
+                      datasets: datasets,
+                  },
+
+                  options: {
+
+                    aspectRatio: 0.9,
+
+                    title: {
+                      display: true,
+                      text: `${scenarioStrings[scenario]}`,
+                    },
+
+                    // legend: {
+                    //   labels: {
+                    //     filter: function(item, data) {
+                    //       return !(item.text.includes('hide'));
+                    //     }
+                    //   }
+                    // },
+
+                    tooltips: {
+                      callbacks: {
+                        label: function(tooltipItem, data) {
+                          var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                          if (label) {
+                            label += ': ';
+                          }
+                          label += Math.round(tooltipItem.yLabel * 1000) / 1000;
+                          return label;
+                        }
+                      }
+                    },
+                    
+                    legend: {display: false},
+
+                    scales: {
+                      yAxes: [{
+                        ticks: {
+                          min: minY,
+                          max: maxY,
+                          // suggestedMin: -8,
+                          // suggestedMax: 6,
+                        }
+                      }]
+                    },
+
+                    annotation: {annotations: recessionPeriods}
+
+                  },
+
+              });
+              
+              if (chartNumber == 0) {
+                document.querySelector('.legend').innerHTML = chart.generateLegend();
+              }
+              chartNumber++;
+              let lis = document.querySelectorAll('li');
+              for (let item of lis) {
+                if (item.innerText == 'Individual SPF') {
+                  item.remove();
+                }
+                if (item.innerText.includes('_nofa') || item.innerText.includes('_cql') || item.innerText.includes('_ew') || item.innerText.includes('_dy457')) {
+                  let oldInnerHTML = item.innerHTML;
+                  item.innerHTML = oldInnerHTML.replace('background-color: ', 'border-style: dotted; border-color: ');
+                }
+              }
+
+              }
+
+            // let breakLine = document.createElement('div');
+            // breakLine.classList.add('w-100');
+            // bigChart.appendChild(breakLine);
+
+            });
+          
+        }
+
+
+      });
+
+    </script>
+
+  </body>
+
+</html>

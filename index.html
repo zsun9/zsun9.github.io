@@ -1,126 +1,44 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Normal Distribution App</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <style>
-        body {
-            padding: 20px;
-        }
-        #sidebar {
-            width: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            z-index: 1;
-            background: #f8f9fa;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding: 20px;
-        }
-        #sidebar.active {
-            width: 250px;
-        }
-        #sidebar .btn {
-            margin: 10px 0;
-        }
-        #functions {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div id="sidebar">
-        <h3>Select Parameters</h3>
-        <label for="mu">Mean (μ):</label>
-        <input type="number" id="mu" class="form-control">
-        <label for="sigma">Standard Deviation (σ):</label>
-        <input type="number" id="sigma" class="form-control">
-        <button id="generate" class="btn btn-primary">Generate</button>
-        <div id="functions"></div>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>宏观经济预测与分析平台</title>
+    <meta name='description' content='MMB forecasting application'>
+    <link rel='stylesheet' href='./css/bootstrap.min.css'>
+    <link rel='stylesheet' href='./css/stylesheet.css'>
+  </head>
+
+  <body data-spy='scroll' data-target='#navbar-example'>
+
+    <div id='navbar_placeholder'></div>
+
+    <div class='container'>
+      <h1 class='page-header'>宏观经济预测与分析平台</h1>
+      <p class='lead'>该平台基于宏观经济数据，根据前沿的宏观经济和贝叶斯时间序列模型，提供实时宏观经济预测。</p>
+      <p>您可以通过<a href='./forecast'>变量预测图</a>和<a href='./rmse'>预测误差表</a>对预测结果进行比较.</p>
+      <p>要深入了解预测结果的差异，您还可以<a href='./variable'>绘制输入数据的时间序列图</a>并<a href='./about'>阅读预测模型与预测方法的相关介绍</a>.</p> 
     </div>
-    <button id="toggleSidebar" class="btn btn-primary">Select Parameters</button>
-    <canvas id="chart"></canvas>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- <div class='container'>
+      <p class='invisible'>The chart below displays the latest U.S. GDP growth nowcast and forecast based on input variables collected on May 12th, 2020.</p>
+    </div> -->
+
+    <!-- <footer class='navbar fixed-bottom'>
+        <p class='text-muted'>Place sticky footer content here.</p>
+    </footer> -->
+
+    <script src='./js/jquery.js'></script>
+    <script src='./js/popper.min.js'></script>
+    <script src='./js/bootstrap.min.js'></script>
     <script>
-        const ctx = document.getElementById('chart').getContext('2d');
-        let chart;
-        let datasets = [];
+      'use strict';
 
-        function random_rgba() {
-            const o = Math.round, r = Math.random, s = 255;
-            return `rgba(${o(r()*s)}, ${o(r()*s)}, ${o(r()*s)}, 0.7)`;
-        }
-
-        function normalDistribution(x, mu, sigma) {
-            return Math.exp(-Math.pow(x - mu, 2) / (2 * Math.pow(sigma, 2))) / (sigma * Math.sqrt(2 * Math.PI));
-        }
-
-        function addFunction(mu, sigma) {
-            const x = Array.from({length: 100}, (_, i) => i - 50);
-            const y = x.map(xi => normalDistribution(xi, mu, sigma));
-            const color = random_rgba();
-            datasets.push({
-                label: `Normal Distribution (μ=${mu}, σ=${sigma})`,
-                data: y,
-                backgroundColor: color,
-                borderColor: color,
-                borderWidth: 1
-            });
-            updateChart();
-            addFunctionElement(mu, sigma);
-        }
-
-        function removeFunction(mu, sigma) {
-            datasets = datasets.filter(dataset => dataset.label !== `Normal Distribution (μ=${mu}, σ=${sigma})`);
-            updateChart();
-            document.getElementById(`function-${mu}-${sigma}`).remove();
-        }
-
-        function updateChart() {
-            const x = Array.from({length: 100}, (_, i) => i - 50);
-            const data = {
-                labels: x,
-                datasets: datasets
-            };
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: data,
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'Normal Distributions'
-                    },
-                }
-            });
-        }
-
-        function addFunctionElement(mu, sigma) {
-            const div = document.createElement('div');
-            div.id = `function-${mu}-${sigma}`;
-            div.innerHTML = `
-                <div class="alert alert-secondary" role="alert">
-                    μ=${mu}, σ=${sigma} 
-                    <button onclick="removeFunction(${mu}, ${sigma})" class="btn btn-sm btn-danger float-right">Delete</button>
-                </div>
-            `;
-            document.getElementById('functions').appendChild(div);
-        }
-
-        document.getElementById('generate').addEventListener('click', () => {
-            const mu = parseFloat(document.getElementById('mu').value);
-            const sigma = parseFloat(document.getElementById('sigma').value);
-            addFunction(mu, sigma);
-            document.getElementById('sidebar').classList.remove('active');
-        });
-
-        document.getElementById('toggleSidebar').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.add('active');
-        });
+      $('#navbar_placeholder').load('./common/navbar.html');
+      
     </script>
-</body>
+
+  </body>
+
 </html>

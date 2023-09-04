@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>宏观经济预测与分析平台</title>
+    <meta name='description' content='MMB forecasting application'>
+    <link rel='stylesheet' href='./css/bootstrap.min.css'>
+    <link rel='stylesheet' href='./css/stylesheet.css'>
+  </head>
+
+  <body data-spy='scroll' data-target='#navbar-example'>
+
+    <div id='navbar_placeholder'></div>
+
+    <div class='container'>
+      <h1 class='page-header'>宏观经济预测与分析平台</h1>
+      <p class='lead'>该平台基于宏观经济数据，根据前沿的宏观经济和贝叶斯时间序列模型，提供实时宏观经济预测。</p>
+      <p>您可以通过<a href='./forecast'>变量预测图</a>和<a href='./rmse'>预测误差表</a>对预测结果进行比较.</p>
+      <p>要深入了解预测结果的差异，您还可以<a href='./variable'>绘制输入数据的时间序列图</a>并<a href='./about'>阅读预测模型与预测方法的相关介绍</a>.</p> 
+    </div>
+
+    <!-- <div class='container'>
+      <p class='invisible'>The chart below displays the latest U.S. GDP growth nowcast and forecast based on input variables collected on May 12th, 2020.</p>
+    </div> -->
+
+    <!-- <footer class='navbar fixed-bottom'>
+        <p class='text-muted'>Place sticky footer content here.</p>
+    </footer> -->
+
+    <script src='./js/jquery.js'></script>
+    <script src='./js/popper.min.js'></script>
+    <script src='./js/bootstrap.min.js'></script>
+    <script>
+      'use strict';
+
+      $('#navbar_placeholder').load('./common/navbar_login.html');
+      
+    </script>
+
+  </body>
+
+</html>
